@@ -9,25 +9,20 @@
 
 ## Table of Contents
 
-1. [Authentication](#1-authentication)
-2. [Dashboard](#2-dashboard)
-3. [Projects](#3-projects)
-4. [Plans & Sheets](#4-plans--sheets)
-5. [Specs](#5-specs)
-6. [Scopes](#6-scopes)
+1. [Dashboard](#1-dashboard)
+2. [Projects](#2-projects)
+3. [Plans & Sheets](#3-plans--sheets)
+4. [Specs](#4-specs)
+5. [Scopes](#5-scopes)
+6. [Takeoffs](#6-takeoffs)
 7. [Bid Packages](#7-bid-packages)
 8. [Subcontractors (CRM)](#8-subcontractors-crm)
 9. [Contacts](#9-contacts)
 10. [Invitations](#10-invitations)
 11. [Sub Planroom (No-Login)](#11-sub-planroom-no-login)
 12. [Bids](#12-bids)
-13. [Inbox & Replies](#13-inbox--replies)
-14. [Takeoffs](#14-takeoffs)
-15. [Bid Leveling & Award](#15-bid-leveling--award)
-16. [Tasks](#16-tasks)
-17. [Action Plans](#17-action-plans)
-18. [Admin](#18-admin)
-19. [Webhooks](#19-webhooks)
+13. [Bid Leveling & Award](#13-bid-leveling--award)
+
 
 ---
 
@@ -77,121 +72,7 @@ Authorization: Bearer {token}
 
 ---
 
-## 1. Authentication
-
-### POST `/auth/login`
-Login with email and password.
-
-**Auth Required:** No
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "password": "secret123"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGci...",
-    "token_type": "Bearer",
-    "expires_in": 3600,
-    "user": {
-      "id": 1,
-      "name": "John Doe",
-      "email": "user@example.com",
-      "role": "estimator"
-    }
-  }
-}
-```
-
----
-
-### POST `/auth/logout`
-Logout and invalidate the current token.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "message": "Logged out successfully"
-}
-```
-
----
-
-### POST `/auth/refresh`
-Refresh the access token.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGci...",
-    "expires_in": 3600
-  }
-}
-```
-
----
-
-### GET `/auth/me`
-Get the currently authenticated user's profile.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "name": "John Doe",
-    "email": "user@example.com",
-    "role": "estimator",
-    "org_id": 10,
-    "created_at": "2026-01-01T00:00:00Z"
-  }
-}
-```
-
----
-
-### POST `/auth/sso/saml`
-Initiate SAML SSO login (Azure Entra).
-
-**Auth Required:** No
-
-**Request Body:**
-```json
-{
-  "org_slug": "acme-corp"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "redirect_url": "https://login.microsoftonline.com/saml/..."
-  }
-}
-```
-
----
-
-## 2. Dashboard
+## 1. Dashboard
 
 ### GET `/dashboard`
 Get dashboard summary including stats, alerts, and pending tasks.
@@ -229,7 +110,7 @@ Get dashboard summary including stats, alerts, and pending tasks.
 
 ---
 
-## 3. Projects
+## 2. Projects
 
 ### GET `/projects`
 List all projects.
@@ -260,39 +141,6 @@ List all projects.
     }
   ],
   "meta": { "current_page": 1, "total": 25 }
-}
-```
-
----
-
-### POST `/projects`
-Create a new project.
-
-**Auth Required:** Yes | **Role:** admin, sr_estimator, estimator
-
-**Request Body:**
-```json
-{
-  "name": "Westside Medical Tower",
-  "stage": "active",
-  "budget": 15000000,
-  "location": "Los Angeles, CA",
-  "bid_due_date": "2026-06-30"
-}
-```
-
-**Response `201`:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "name": "Westside Medical Tower",
-    "stage": "active",
-    "budget": 15000000,
-    "created_at": "2026-05-13T10:00:00Z"
-  },
-  "message": "Project created successfully"
 }
 ```
 
@@ -329,46 +177,6 @@ Get a single project's details.
 
 ---
 
-### PATCH `/projects/{id}`
-Update a project.
-
-**Auth Required:** Yes | **Role:** admin, sr_estimator, estimator
-
-**Request Body:**
-```json
-{
-  "name": "Westside Medical Tower - Phase 2",
-  "stage": "closed",
-  "budget": 17000000
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": { "id": 1, "name": "Westside Medical Tower - Phase 2" },
-  "message": "Project updated successfully"
-}
-```
-
----
-
-### DELETE `/projects/{id}`
-Delete a project.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "message": "Project deleted successfully"
-}
-```
-
----
-
 ### POST `/projects/{id}/link/procore`
 Link a project to Procore.
 
@@ -396,7 +204,7 @@ Link a project to Procore.
 
 ---
 
-## 4. Plans & Sheets
+## 3. Plans & Sheets
 
 ### GET `/projects/{id}/sheets`
 List all sheets (plan pages) for a project.
@@ -430,34 +238,6 @@ List all sheets (plan pages) for a project.
 
 ---
 
-### POST `/sheets/upload`
-Upload a plan PDF. The system splits it into individual Sheet rows.
-
-**Auth Required:** Yes | **Role:** admin, sr_estimator, estimator
-
-**Request Body:** `multipart/form-data`
-
-| Field        | Type   | Required | Description          |
-|--------------|--------|----------|----------------------|
-| `project_id` | integer| Yes      | Project ID           |
-| `file`       | file   | Yes      | PDF file             |
-| `discipline` | string | No       | Discipline label     |
-
-**Response `201`:**
-```json
-{
-  "success": true,
-  "data": {
-    "sheets_created": 24,
-    "upload_id": "upl_abc123",
-    "status": "processing"
-  },
-  "message": "Upload successful, indexing in progress"
-}
-```
-
----
-
 ### GET `/sheets/{id}`
 Get sheet detail with AI metadata.
 
@@ -481,55 +261,7 @@ Get sheet detail with AI metadata.
 
 ---
 
-### PATCH `/sheets/{id}`
-Update sheet metadata (discipline, labels).
-
-**Auth Required:** Yes | **Role:** estimator, sr_estimator
-
-**Request Body:**
-```json
-{
-  "discipline": "Mechanical",
-  "ai_labels": ["ductwork", "hvac"]
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": { "id": 10, "discipline": "Mechanical" },
-  "message": "Sheet updated"
-}
-```
-
----
-
-### POST `/sheets/index`
-Trigger AI re-indexing on uploaded sheets.
-
-**Auth Required:** Yes | **Role:** admin, sr_estimator
-
-**Request Body:**
-```json
-{
-  "project_id": 1,
-  "sheet_ids": [10, 11, 12]
-}
-```
-
-**Response `202`:**
-```json
-{
-  "success": true,
-  "message": "AI indexing job queued",
-  "data": { "job_id": "job_xyz789" }
-}
-```
-
----
-
-## 5. Specs
+## 4. Specs
 
 ### GET `/projects/{id}/specs`
 List specification sections (CSI MasterFormat) for a project.
@@ -561,32 +293,6 @@ List specification sections (CSI MasterFormat) for a project.
 
 ---
 
-### POST `/projects/{id}/specs`
-Upload or create a spec section.
-
-**Auth Required:** Yes | **Role:** estimator, sr_estimator
-
-**Request Body:** `multipart/form-data` or JSON
-
-```json
-{
-  "section_number": "16050",
-  "title": "Basic Electrical Materials and Methods",
-  "content": "Full spec text here..."
-}
-```
-
-**Response `201`:**
-```json
-{
-  "success": true,
-  "data": { "id": 5, "section_number": "16050", "title": "Basic Electrical Materials" },
-  "message": "Spec section created"
-}
-```
-
----
-
 ### GET `/specs/{id}`
 Get a single spec section's full detail.
 
@@ -608,7 +314,7 @@ Get a single spec section's full detail.
 
 ---
 
-## 6. Scopes
+## 5. Scopes
 
 ### GET `/projects/{id}/scopes`
 List all scopes for a project.
@@ -637,33 +343,6 @@ List all scopes for a project.
       "approved_at": "2026-04-20T14:00:00Z"
     }
   ]
-}
-```
-
----
-
-### POST `/projects/{id}/scopes`
-Create a new scope of work.
-
-**Auth Required:** Yes | **Role:** estimator, sr_estimator
-
-**Request Body:**
-```json
-{
-  "trade": "Electrical",
-  "title": "Electrical Scope - WMT",
-  "description": "Full scope of work for electrical...",
-  "sheet_ids": [10, 11],
-  "spec_ids": [5]
-}
-```
-
-**Response `201`:**
-```json
-{
-  "success": true,
-  "data": { "id": 20, "trade": "Electrical", "status": "draft" },
-  "message": "Scope created"
 }
 ```
 
@@ -734,29 +413,55 @@ Approve a scope (creates a locked version).
 
 ---
 
-### POST `/scopes/{id}/draft-ai`
-AI-draft scope content from referenced sheets and specs.
+## 6. Takeoffs
 
-**Auth Required:** Yes | **Role:** estimator, sr_estimator
+### GET `/projects/{id}/takeoffs`
+List all takeoffs for a project.
 
-**Request Body:**
+**Auth Required:** Yes
+
+**Response `200`:**
 ```json
 {
-  "sheet_ids": [10, 11],
-  "spec_ids": [5],
-  "instructions": "Focus on panel and conduit work"
+  "success": true,
+  "data": [
+    {
+      "id": 600,
+      "scope_id": 20,
+      "name": "Outlet Count - Floor 3",
+      "trade": "Electrical",
+      "total_quantity": 142,
+      "created_at": "2026-04-15T10:00:00Z"
+    }
+  ]
 }
 ```
+
+---
+
+### GET `/takeoffs/{id}`
+Get takeoff detail with annotations.
+
+**Auth Required:** Yes
 
 **Response `200`:**
 ```json
 {
   "success": true,
   "data": {
-    "draft_content": "AI-generated scope of work...",
-    "confidence": 0.87
-  },
-  "message": "AI draft generated"
+    "id": 600,
+    "name": "Outlet Count - Floor 3",
+    "total_quantity": 142,
+    "annotations": [
+      {
+        "sheet_id": 10,
+        "type": "count",
+        "label": "duplex outlet",
+        "count": 78,
+        "marks": [{ "x": 120, "y": 340 }]
+      }
+    ]
+  }
 }
 ```
 
@@ -1533,268 +1238,7 @@ Update bid details (admin/estimator only — for corrections).
 
 ---
 
-## 13. Inbox & Replies
-
-### GET `/inbox`
-Get inbox messages (inbound email replies, RFIs, system messages).
-
-**Auth Required:** Yes
-
-**Query Parameters:**
-
-| Parameter    | Type    | Required | Description                                           |
-|--------------|---------|----------|-------------------------------------------------------|
-| `package_id` | integer | No       | Filter by package                                     |
-| `intent`     | string  | No       | bid_submitted, decline, rfi, extension_request        |
-| `confirmed`  | boolean | No       | Filter by AI action confirmed status                  |
-| `page`       | integer | No       | Page number                                           |
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 500,
-      "from": "mike@apexelectric.com",
-      "subject": "RE: Invitation - Electrical · WMT-2405",
-      "direction": "in",
-      "intent": "bid_submitted",
-      "ai_confidence": 0.95,
-      "suggested_action": "mark_bid_received",
-      "confirmed": false,
-      "received_at": "2026-05-10T13:50:00Z"
-    }
-  ]
-}
-```
-
----
-
-### GET `/replies/{id}`
-Get full detail of a single reply.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": 500,
-    "from": "mike@apexelectric.com",
-    "body": "Please find attached our bid for the above project...",
-    "direction": "in",
-    "classification": {
-      "intent": "bid_submitted",
-      "confidence": 0.95,
-      "suggested_action": "mark_bid_received"
-    },
-    "confirmed": false,
-    "attachments": []
-  }
-}
-```
-
----
-
-### POST `/replies/{id}/confirm`
-Confirm an AI-suggested action on a reply.
-
-**Auth Required:** Yes | **Role:** estimator, coordinator, sr_estimator
-
-**Request Body:**
-```json
-{
-  "action": "mark_bid_received",
-  "override_intent": null
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": { "reply_id": 500, "action_taken": "mark_bid_received" },
-  "message": "Action confirmed"
-}
-```
-
----
-
-### POST `/inbound/email`
-Inbound email webhook — receives emails from SES/Postal. **DKIM verified.**
-
-**Auth Required:** DKIM signature verification
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "message": "Email received"
-}
-```
-
----
-
-## 14. Takeoffs
-
-### GET `/projects/{id}/takeoffs`
-List all takeoffs for a project.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 600,
-      "scope_id": 20,
-      "name": "Outlet Count - Floor 3",
-      "trade": "Electrical",
-      "total_quantity": 142,
-      "created_at": "2026-04-15T10:00:00Z"
-    }
-  ]
-}
-```
-
----
-
-### POST `/projects/{id}/takeoffs`
-Create a new takeoff.
-
-**Auth Required:** Yes | **Role:** estimator, sr_estimator
-
-**Request Body:**
-```json
-{
-  "scope_id": 20,
-  "name": "Outlet Count - Floor 3",
-  "trade": "Electrical",
-  "sheet_ids": [10, 11]
-}
-```
-
-**Response `201`:**
-```json
-{
-  "success": true,
-  "data": { "id": 600, "name": "Outlet Count - Floor 3" },
-  "message": "Takeoff created"
-}
-```
-
----
-
-### GET `/takeoffs/{id}`
-Get takeoff detail with annotations.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": 600,
-    "name": "Outlet Count - Floor 3",
-    "total_quantity": 142,
-    "annotations": [
-      {
-        "sheet_id": 10,
-        "type": "count",
-        "label": "duplex outlet",
-        "count": 78,
-        "marks": [{ "x": 120, "y": 340 }]
-      }
-    ]
-  }
-}
-```
-
----
-
-### PATCH `/takeoffs/{id}`
-Update takeoff metadata.
-
-**Auth Required:** Yes | **Role:** estimator, sr_estimator
-
-**Request Body:**
-```json
-{
-  "name": "Outlet Count - Floor 3 (Revised)"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": { "id": 600, "name": "Outlet Count - Floor 3 (Revised)" },
-  "message": "Takeoff updated"
-}
-```
-
----
-
-### POST `/takeoffs/{id}/annotations`
-Save annotations (quantity marks) on a takeoff.
-
-**Auth Required:** Yes | **Role:** estimator, sr_estimator
-
-**Request Body:**
-```json
-{
-  "sheet_id": 10,
-  "annotations": [
-    {
-      "type": "count",
-      "label": "duplex outlet",
-      "marks": [{ "x": 120, "y": 340 }, { "x": 200, "y": 150 }]
-    }
-  ]
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": { "annotations_saved": 2 },
-  "message": "Annotations saved"
-}
-```
-
----
-
-### POST `/takeoffs/{id}/ai-detect`
-Trigger AI auto-detection of quantities on plan sheets.
-
-**Auth Required:** Yes | **Role:** estimator, sr_estimator
-
-**Request Body:**
-```json
-{
-  "sheet_ids": [10, 11],
-  "detect_types": ["outlet", "light_fixture", "panel"]
-}
-```
-
-**Response `202`:**
-```json
-{
-  "success": true,
-  "data": { "job_id": "detect_job_123" },
-  "message": "AI detection queued"
-}
-```
-
----
-
-## 15. Bid Leveling & Award
+## 13. Bid Leveling & Award
 
 ### GET `/packages/{id}/leveling`
 Get the bid leveling comparison table for a package.
@@ -1946,532 +1390,6 @@ Send contract to sub via DocuSign for signature.
   },
   "message": "Contract sent via DocuSign"
 }
-```
-
----
-
-## 16. Tasks
-
-### GET `/tasks`
-List all tasks.
-
-**Auth Required:** Yes
-
-**Query Parameters:**
-
-| Parameter    | Type    | Required | Description                          |
-|--------------|---------|----------|--------------------------------------|
-| `project_id` | integer | No       | Filter by project                    |
-| `assigned_to`| integer | No       | Filter by user ID                    |
-| `status`     | string  | No       | todo, in_progress, done, blocked     |
-| `source`     | string  | No       | manual, ai_suggested, action_plan    |
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 800,
-      "title": "Chase reply from Apex Electric",
-      "status": "todo",
-      "source": "ai_suggested",
-      "assigned_to": { "id": 1, "name": "John Doe" },
-      "due_date": "2026-05-15",
-      "project_id": 1
-    }
-  ]
-}
-```
-
----
-
-### POST `/tasks`
-Create a new task.
-
-**Auth Required:** Yes
-
-**Request Body:**
-```json
-{
-  "title": "Chase reply from Apex Electric",
-  "project_id": 1,
-  "package_id": 42,
-  "assigned_to": 1,
-  "due_date": "2026-05-15",
-  "source": "manual"
-}
-```
-
-**Response `201`:**
-```json
-{
-  "success": true,
-  "data": { "id": 800, "title": "Chase reply from Apex Electric", "status": "todo" },
-  "message": "Task created"
-}
-```
-
----
-
-### GET `/tasks/{id}`
-Get task detail.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": 800,
-    "title": "Chase reply from Apex Electric",
-    "status": "todo",
-    "source": "ai_suggested",
-    "project_id": 1,
-    "package_id": 42,
-    "assigned_to": { "id": 1, "name": "John Doe" },
-    "due_date": "2026-05-15"
-  }
-}
-```
-
----
-
-### PATCH `/tasks/{id}`
-Update a task.
-
-**Auth Required:** Yes
-
-**Request Body:**
-```json
-{
-  "title": "Updated task title",
-  "assigned_to": 2,
-  "due_date": "2026-05-20"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": { "id": 800, "assigned_to": 2 },
-  "message": "Task updated"
-}
-```
-
----
-
-### POST `/tasks/{id}/transition`
-Change the state of a task.
-
-**Auth Required:** Yes
-
-**Request Body:**
-```json
-{
-  "status": "in_progress",
-  "note": "Started working on follow-up"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": { "id": 800, "status": "in_progress" },
-  "message": "Task status updated"
-}
-```
-
----
-
-### DELETE `/tasks/{id}`
-Delete a task.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "message": "Task deleted"
-}
-```
-
----
-
-## 17. Action Plans
-
-### GET `/action-plan-templates`
-List all org-level action plan templates.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "Standard Bid Workflow",
-      "stages": ["Scope Review", "Package Creation", "Invitation", "Leveling", "Award"],
-      "is_default": true
-    }
-  ]
-}
-```
-
----
-
-### POST `/action-plan-templates`
-Create a new action plan template.
-
-**Auth Required:** Yes | **Role:** admin, sr_estimator
-
-**Request Body:**
-```json
-{
-  "name": "Fast-Track Bid Workflow",
-  "stages": [
-    { "name": "Scope Review", "order": 1, "days_allowed": 3 },
-    { "name": "Package Creation", "order": 2, "days_allowed": 2 }
-  ]
-}
-```
-
-**Response `201`:**
-```json
-{
-  "success": true,
-  "data": { "id": 2, "name": "Fast-Track Bid Workflow" },
-  "message": "Template created"
-}
-```
-
----
-
-### GET `/projects/{id}/action-plan`
-Get the action plan for a specific project.
-
-**Auth Required:** Yes
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "project_id": 1,
-    "template_id": 1,
-    "stages": [
-      {
-        "name": "Scope Review",
-        "order": 1,
-        "status": "completed",
-        "completed_at": "2026-04-20T10:00:00Z"
-      }
-    ]
-  }
-}
-```
-
----
-
-### PATCH `/projects/{id}/action-plan`
-Update action plan stage statuses for a project.
-
-**Auth Required:** Yes | **Role:** estimator, sr_estimator, coordinator
-
-**Request Body:**
-```json
-{
-  "stages": [
-    { "order": 2, "status": "in_progress" }
-  ]
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "message": "Action plan updated"
-}
-```
-
----
-
-## 18. Admin
-
-### GET `/admin/org`
-Get organization settings.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": 10,
-    "name": "ACME Construction",
-    "slug": "acme-construction",
-    "logo_url": "https://storage.example.com/logos/acme.png",
-    "default_region": "LA",
-    "inbound_email_domain": "inbound.bidflow.io"
-  }
-}
-```
-
----
-
-### PATCH `/admin/org`
-Update organization settings.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Request Body:**
-```json
-{
-  "name": "ACME Construction Inc.",
-  "default_region": "SoCal"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "message": "Organization updated"
-}
-```
-
----
-
-### GET `/admin/users`
-List all users in the organization.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "John Doe",
-      "email": "john@acme.com",
-      "role": "estimator",
-      "status": "active",
-      "created_at": "2026-01-01T00:00:00Z"
-    }
-  ]
-}
-```
-
----
-
-### POST `/admin/users`
-Invite or create a new user.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Request Body:**
-```json
-{
-  "name": "Jane Smith",
-  "email": "jane@acme.com",
-  "role": "sr_estimator"
-}
-```
-
-**Response `201`:**
-```json
-{
-  "success": true,
-  "data": { "id": 5, "name": "Jane Smith", "email": "jane@acme.com" },
-  "message": "User invited successfully"
-}
-```
-
----
-
-### PATCH `/admin/users/{id}`
-Update a user's role or status.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Request Body:**
-```json
-{
-  "role": "coordinator",
-  "status": "active"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": { "id": 5, "role": "coordinator" },
-  "message": "User updated"
-}
-```
-
----
-
-### DELETE `/admin/users/{id}`
-Deactivate a user.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "message": "User deactivated"
-}
-```
-
----
-
-### GET `/admin/integrations`
-List all integration configurations.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    { "type": "procore", "connected": true, "connected_at": "2026-03-01T00:00:00Z" },
-    { "type": "docusign", "connected": false },
-    { "type": "microsoft_365", "connected": true }
-  ]
-}
-```
-
----
-
-### PATCH `/admin/integrations/{type}`
-Update integration configuration.
-
-**Auth Required:** Yes | **Role:** admin
-
-**Path Parameters:** `type` = procore | docusign | microsoft_365
-
-**Request Body:**
-```json
-{
-  "client_id": "abc123",
-  "client_secret": "secret_xyz",
-  "webhook_secret": "hmac_secret"
-}
-```
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "message": "Integration updated"
-}
-```
-
----
-
-### GET `/admin/audit`
-View the audit log (append-only, 7-year retention).
-
-**Auth Required:** Yes | **Role:** admin
-
-**Query Parameters:**
-
-| Parameter    | Type    | Required | Description                 |
-|--------------|---------|----------|-----------------------------|
-| `from`       | date    | No       | Start date (YYYY-MM-DD)     |
-| `to`         | date    | No       | End date (YYYY-MM-DD)       |
-| `actor_id`   | integer | No       | Filter by user              |
-| `entity`     | string  | No       | project, package, bid, etc. |
-| `page`       | integer | No       | Page number                 |
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 9001,
-      "actor": { "id": 1, "name": "John Doe" },
-      "action": "package.sent",
-      "entity": "BidPackage",
-      "entity_id": 42,
-      "metadata": {},
-      "created_at": "2026-05-01T09:00:00Z"
-    }
-  ]
-}
-```
-
----
-
-## 19. Webhooks
-
-> All webhooks are **HMAC SHA-256 verified**. Validate the `X-Signature` header before processing.
-
-### POST `/webhooks/procore`
-Receive Procore event notifications.
-
-**Auth Required:** HMAC Signature (`X-Procore-Signature`)
-
-**Request Body (Procore sends):**
-```json
-{
-  "event_type": "commitment.updated",
-  "resource_id": "PC-9981",
-  "project_id": "98765"
-}
-```
-
-**Response `200`:**
-```json
-{ "received": true }
-```
-
----
-
-### POST `/webhooks/docusign`
-Receive DocuSign envelope status updates.
-
-**Auth Required:** HMAC Signature (`X-DocuSign-Signature`)
-
-**Request Body (DocuSign sends):**
-```json
-{
-  "event": "envelope-completed",
-  "envelopeId": "env_xyz123",
-  "status": "completed"
-}
-```
-
-**Response `200`:**
-```json
-{ "received": true }
-```
-
----
-
-### POST `/webhooks/email`
-Receive inbound emails from SES/Postal (DKIM verified).
-
-**Auth Required:** DKIM Verification
-
-**Response `200`:**
-```json
-{ "received": true }
 ```
 
 ---
